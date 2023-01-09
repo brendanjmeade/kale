@@ -63,6 +63,11 @@ class Engine:
     def active_variable(self, name):
         if name not in self.keys:
             raise ValueError(f"{name} not present in dataset keys: {self.keys}")
+        # Clear out old variable
+        if self._active_variable in self.mesh.point_data:
+            self.mesh.point_data.remove(self._active_variable)
+        if self._active_variable in self.mesh.cell_data:
+            self.mesh.cell_data.remove(self._active_variable)
         self._active_variable = name
         self._variable_invalidated = True
         self.mesh[self.active_variable] = self.variable[self.time_step, :]
