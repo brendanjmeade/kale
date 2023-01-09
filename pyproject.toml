@@ -1,0 +1,38 @@
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "kale"
+authors = [{name = "Brendan Meade", email = "kitware@kitware.com"}]
+readme = "README.md"
+license = {file = "LICENSE"}
+dynamic = ["version", "description"]
+classifiers=[
+    "Development Status :: 4 - Beta",
+    "Framework :: Pytest",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Testing",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Operating System :: OS Independent",
+    "License :: OSI Approved :: MIT License",
+]
+dependencies=["pyvista", "h5py", "matplotlib"]
+python_requires=">=3.9"
+
+[project.urls]
+Home = "https://github.com/brendanjmeade/kale"
+
+[tool.isort]
+profile = 'black'
+line_length = 100
+# Sort by name, don't cluster "from" vs "import"
+force_sort_within_sections = true
+# Combines "as" imports on the same line
+combine_as_imports = true
+skip_glob = 'kale/__init__.py'
+
+[tool.mypy]
+ignore_missing_imports = true
