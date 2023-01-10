@@ -1,9 +1,9 @@
 """Kale Engine."""
 from pathlib import Path
 
-import h5py
 import numpy as np
 import pyvista as pv
+import xarray as xr
 
 
 class Engine:
@@ -14,7 +14,7 @@ class Engine:
             raise ValueError(f"`{data_filename} does not exist.")
 
         self._mesh = pv.read(mesh_filename)
-        self._ds = h5py.File(data_filename, "r")
+        self._ds = xr.open_dataset(data_filename)
 
         self._modified_callbacks = set()
 
@@ -24,13 +24,8 @@ class Engine:
         # Scale Z axis on mesh itself to avoid scaled-rendering issues
         self.mesh.points[:, -1] *= zscale
 
-        # Default to first key
-        self._active_variable = self.keys[0]
-
-        self._variable = None
-        self._variable_invalidated = True
-
         # Set initial time step and populate mesh
+        self.max_time_step = self.ds[self.keys[0]].shape[0] - 1
         self.time_step = 0
 
     def modified(self):
@@ -55,43 +50,20 @@ class Engine:
     def keys(self):
         return list(self.ds.keys())
 
-    @property
-    def active_variable(self):
-        return self._active_variable
+    def get_variable(self, name):
+        """Returns variable array for current time step."""
+        var = np.array(self.ds[name][self.time_step, :])
+        if len(var) != self.mesh.n_cells:
+            raise ValueError("Dimensional mismatch between data and mesh")
+        return var
 
-    @active_variable.setter
-    def active_variable(self, name):
-        if name not in self.keys:
-            raise ValueError(f"{name} not present in dataset keys: {self.keys}")
-        self._active_variable = name
-        self._variable_invalidated = True
-        self.mesh[self.active_variable] = self.variable[self.time_step, :]
-        self.mesh.set_active_scalars(self.active_variable)
-        self.modified()
-
-    @property
-    def variable(self):
-        if self._variable_invalidated:  # caching of sorts
-            var = np.array(self.ds[self.active_variable])
-            if var.shape[1] != self.mesh.n_cells:
-                raise ValueError("Dimensional mismatch between data and mesh")
-            self._variable = var
-            self._variable_invalidated = False
-            self.modified()
-        return self._variable
-
-    @property
-    def clim(self):
-        var = self.variable
+    def clim(self, name=None):
+        var = np.array(self.ds[name or self.mesh.active_scalars_name or self.keys[0]])
         return np.nanmin(var), np.nanmax(var)
 
     @property
     def time_step(self):
         return self._time_step
-
-    @property
-    def max_time_step(self):
-        return self.variable.shape[0] - 1
 
     @time_step.setter
     def time_step(self, value):
@@ -100,5 +72,6 @@ class Engine:
         if value < 0 or value > self.max_time_step:
             raise ValueError("Time step out of time range.")
         self._time_step = value
-        self.mesh[self.active_variable] = self.variable[self._time_step, :]
+        for name in self.keys:
+            self.mesh[name] = self.get_variable(name)
         self.modified()

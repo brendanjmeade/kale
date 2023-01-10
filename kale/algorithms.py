@@ -4,8 +4,11 @@ import pyvista
 from pyvista import _vtk
 from pyvista.errors import MissingDataError
 from pyvista.utilities.algorithms import (
+    PreserveTypeAlgorithmBase,
     active_scalars_algorithm,
     algorithm_to_mesh_handler,
+    cell_data_to_point_data_algorithm,
+    extract_surface_algorithm,
     set_algorithm_input,
 )
 
@@ -37,11 +40,46 @@ class EngineAlgorithm(_vtk.VTKPythonAlgorithmBase):
         return 1
 
 
+class RenameArrayAlgorithm(PreserveTypeAlgorithmBase):
+    """vtkAlgorithm to Rename an array"""
+
+    def __init__(self, source_name, new_name):
+        """Initialize algorithm."""
+        _vtk.VTKPythonAlgorithmBase.__init__(
+            self,
+            nInputPorts=1,
+            nOutputPorts=1,
+        )
+        self.source_name = source_name
+        self.new_name = new_name
+
+    def RequestData(self, request, inInfo, outInfo):
+        """Perform algorithm execution."""
+        try:
+            inp = self.GetInputData(inInfo, 0, 0)
+            out = self.GetOutputData(outInfo, 0)
+            out.ShallowCopy(inp)
+            for i in range(out.GetPointData().GetNumberOfArrays()):
+                array = out.GetPointData().GetAbstractArray(i)
+                name = array.GetName()
+                if name == self.source_name:
+                    array.SetName(self.new_name)
+            for i in range(out.GetCellData().GetNumberOfArrays()):
+                array = out.GetCellData().GetAbstractArray(i)
+                name = array.GetName()
+                if name == self.source_name:
+                    array.SetName(self.new_name)
+        except Exception as e:  # pragma: no cover
+            traceback.print_exc()
+            raise e
+        return 1
+
+
 def contour_banded(
     self,
     n_contours,
+    scalars,
     rng=None,
-    scalars=None,
     component=0,
     clip_tolerance=1e-6,
     generate_contour_edges=True,
@@ -67,7 +105,7 @@ def contour_banded(
         Range of the scalars. Optional and defaults to the minimum and
         maximum of the active scalars of ``scalars``.
 
-    scalars : str, optional
+    scalars : str
         The name of the scalar array to use for contouring.  If ``None``,
         the active scalar array will be used.
 
@@ -102,28 +140,27 @@ def contour_banded(
         Get edges with `alg.GetContourEdgesOutput()`
 
     """
+    if scalars is None:
+        raise RuntimeError("Please set scalars")
+
     self, algo = algorithm_to_mesh_handler(self)
 
     if not isinstance(self, _vtk.vtkPolyData):
-        surf_filter = _vtk.vtkDataSetSurfaceFilter()
-        # surf_filter.SetPassThroughPointIds(True)
-        # surf_filter.SetPassThroughCellIds(True)
-        set_algorithm_input(surf_filter, algo or self, port=0)
-        self, algo = algorithm_to_mesh_handler(surf_filter)
+        algo = extract_surface_algorithm(algo or self)
+        self, algo = algorithm_to_mesh_handler(algo)
 
-    # check active scalars
-    if scalars is not None:
-        if algo is not None:
-            algo = active_scalars_algorithm(algo, scalars, preference="point")
-            self, algo = algorithm_to_mesh_handler(algo)
-        else:
-            self.point_data.active_scalars_name = scalars
-    else:
-        if algo is not None:
-            raise RuntimeError
-        pyvista.set_default_active_scalars(self)
-        if self.point_data.active_scalars_name is None:
-            raise MissingDataError("No point scalars to contour.")
+    if algo is None:
+        raise TypeError(
+            "This version of the filter currently only supports algorithms."
+        )
+
+    if scalars not in self.point_data:
+        algo = cell_data_to_point_data_algorithm(algo, pass_cell_data=False)
+        self, algo = algorithm_to_mesh_handler(algo)
+    if scalars not in self.point_data:
+        raise ValueError("Scalars not present as POINT data.")
+    algo = active_scalars_algorithm(algo, scalars, preference="point")
+    self, algo = algorithm_to_mesh_handler(algo)
 
     if rng is None:
         rng = (self.active_scalars.min(), self.active_scalars.max())
@@ -131,7 +168,6 @@ def contour_banded(
     contour = _vtk.vtkBandedPolyDataContourFilter()
     contour.GenerateValues(n_contours, rng[0], rng[1])
     set_algorithm_input(contour, algo or self, port=0)
-    # contour.SetInputConnection(algo.GetOutputPort())
     contour.SetClipping(clipping)
     if scalar_mode == "value":
         contour.SetScalarModeToValue()
@@ -150,5 +186,7 @@ def contour_banded(
     #     mesh.point_data.GetAbstractArray(0).SetName(self.point_data.active_scalars_name)
     # if mesh.cell_data and mesh.cell_data.GetAbstractArray(0).GetName() is None:
     #     mesh.cell_data.GetAbstractArray(0).SetName(self.cell_data.active_scalars_name)
+    rename = RenameArrayAlgorithm(None, scalars)
+    set_algorithm_input(rename, contour, port=0)
 
-    return contour
+    return rename
