@@ -1,0 +1,17 @@
+name: kale
+channels:
+  - conda-forge
+dependencies:
+  - python>=3.7
+  - jupyterlab
+  - numpy
+  - vtk
+  - matplotlib
+  - imageio>=2.5.0
+  - h5py
+  - xarray
+  - ipyvtklink
+  - pip
+  - pip:
+      # NOTE: using development branch
+      - https://github.com/pyvista/pyvista/archive/feat/algorithms.zip
