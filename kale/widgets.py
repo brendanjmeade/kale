@@ -20,7 +20,7 @@ def time_controls(engine: Engine, plotter: pv.BasePlotter):
         update_time_step(step)
 
     play = widgets.Play(
-        value=0,
+        value=engine.time_step,
         min=0,
         max=tmax,
         step=100,

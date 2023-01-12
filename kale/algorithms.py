@@ -82,7 +82,7 @@ def contour_banded(
     rng=None,
     component=0,
     clip_tolerance=1e-6,
-    generate_contour_edges=True,
+    # generate_contour_edges=True,
     scalar_mode="value",
     clipping=True,
 ):
@@ -177,7 +177,8 @@ def contour_banded(
         raise ValueError(
             f'Invalid scalar mode "{scalar_mode}". Should be either "value" or "index".'
         )
-    contour.SetGenerateContourEdges(generate_contour_edges)
+    # contour.SetGenerateContourEdges(generate_contour_edges)
+    contour.SetGenerateContourEdges(True)
     contour.SetClipTolerance(clip_tolerance)
     contour.SetComponent(component)
 
@@ -189,4 +190,5 @@ def contour_banded(
     rename = RenameArrayAlgorithm(None, scalars)
     set_algorithm_input(rename, contour, port=0)
 
-    return rename
+    # GetOutputPort(1) are the edges
+    return rename, contour  # TODO.GetOutputPort(1)

@@ -16,6 +16,8 @@ class Engine:
         self._mesh = pv.read(mesh_filename)
         self._ds = xr.open_dataset(data_filename)
 
+        self._algorithm = None
+
         self._modified_callbacks = set()
 
         # Clear any data arrays in the mesh - only use data from HDF5 file
@@ -75,3 +77,11 @@ class Engine:
         for name in self.keys:
             self.mesh[name] = self.get_variable(name)
         self.modified()
+
+    @property
+    def algorithm(self):
+        if self._algorithm is None:
+            from kale.algorithms import EngineAlgorithm
+
+            self._algorithm = EngineAlgorithm(self)
+        return self._algorithm
