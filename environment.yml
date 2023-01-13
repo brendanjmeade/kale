@@ -9,6 +9,7 @@ dependencies:
   - matplotlib
   - imageio>=2.5.0
   - h5py
+  - netcdf4
   - xarray
   - ipyvtklink
   - pip
