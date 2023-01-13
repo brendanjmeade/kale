@@ -14,4 +14,5 @@ dependencies:
   - pip
   - pip:
       # NOTE: using development branch
-      - https://github.com/pyvista/pyvista/archive/feat/algorithms.zip
+      - https://github.com/pyvista/pyvista/archive/feat/trame.zip
+      - trame
