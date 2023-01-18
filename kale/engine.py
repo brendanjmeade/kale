@@ -14,7 +14,7 @@ class Engine:
             raise ValueError(f"`{data_filename} does not exist.")
 
         self._mesh = pv.read(mesh_filename)
-        self._ds = xr.open_dataset(data_filename, engine='netcdf4')
+        self._ds = xr.open_dataset(data_filename, engine="netcdf4")
 
         self._algorithm = None
 
