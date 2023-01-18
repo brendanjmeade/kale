@@ -12,6 +12,7 @@ dependencies:
   - netcdf4
   - xarray
   - ipyvtklink
+  - colorcet
   - pip
   - pip:
       # NOTE: using development branch
