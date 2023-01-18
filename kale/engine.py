@@ -3,6 +3,7 @@ from pathlib import Path
 
 import numpy as np
 import pyvista as pv
+from pyvista.utilities.algorithms import extract_surface_algorithm
 import xarray as xr
 
 
@@ -83,5 +84,19 @@ class Engine:
         if self._algorithm is None:
             from kale.algorithms import EngineAlgorithm
 
-            self._algorithm = EngineAlgorithm(self)
+            self._algorithm = extract_surface_algorithm(EngineAlgorithm(self))
         return self._algorithm
+
+    @property
+    def boundary(self):
+        """Outline the boundary of the mesh.
+
+        Please note that this is a static mesh (Engine assumes
+        that the mesh geometry does not change).
+        """
+        return self.mesh.extract_feature_edges(
+            boundary_edges=True,
+            non_manifold_edges=False,
+            feature_edges=False,
+            manifold_edges=False,
+        )
