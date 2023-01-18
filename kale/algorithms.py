@@ -41,7 +41,7 @@ class EngineAlgorithm(_vtk.VTKPythonAlgorithmBase):
 
 
 class RenameArrayAlgorithm(PreserveTypeAlgorithmBase):
-    """vtkAlgorithm to Rename an array"""
+    """vtkAlgorithm to rename an array."""
 
     def __init__(self, source_name, new_name):
         """Initialize algorithm."""
@@ -83,7 +83,7 @@ def contour_banded(
     component=0,
     clip_tolerance=1e-6,
     # generate_contour_edges=True,
-    scalar_mode="value",
+    scalar_mode="index",
     clipping=True,
 ):
     """Generate filled contours.
@@ -172,7 +172,7 @@ def contour_banded(
     if scalar_mode == "value":
         contour.SetScalarModeToValue()
     elif scalar_mode == "index":
-        contour.SetScalarModeToValue()
+        contour.SetScalarModeToIndex()
     else:
         raise ValueError(
             f'Invalid scalar mode "{scalar_mode}". Should be either "value" or "index".'
@@ -183,10 +183,7 @@ def contour_banded(
     contour.SetComponent(component)
 
     # Must rename array as VTK sets the active scalars array name to a nullptr.
-    # if mesh.point_data and mesh.point_data.GetAbstractArray(0).GetName() is None:
-    #     mesh.point_data.GetAbstractArray(0).SetName(self.point_data.active_scalars_name)
-    # if mesh.cell_data and mesh.cell_data.GetAbstractArray(0).GetName() is None:
-    #     mesh.cell_data.GetAbstractArray(0).SetName(self.cell_data.active_scalars_name)
+    # See upstream changes also
     rename = RenameArrayAlgorithm(None, scalars)
     set_algorithm_input(rename, contour, port=0)
 
