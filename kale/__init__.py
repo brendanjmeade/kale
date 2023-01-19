@@ -9,4 +9,4 @@ from kale.widgets import time_controls
 from pyvista._vtk import vtkMapper
 
 vtkMapper.SetResolveCoincidentTopologyToPolygonOffset()
-vtkMapper.SetResolveCoincidentTopologyPolygonOffsetParameters(0.1, 0.1)
+vtkMapper.SetResolveCoincidentTopologyPolygonOffsetParameters(1.0, 1.0)
