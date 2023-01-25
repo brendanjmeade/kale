@@ -3,7 +3,10 @@ from pathlib import Path
 
 import numpy as np
 import pyvista as pv
-from pyvista.utilities.algorithms import extract_surface_algorithm
+from pyvista.utilities.algorithms import (
+    cell_data_to_point_data_algorithm,
+    extract_surface_algorithm,
+)
 import xarray as xr
 
 
@@ -18,6 +21,7 @@ class Engine:
         self._ds = xr.open_dataset(data_filename, engine="netcdf4")
 
         self._algorithm = None
+        self._algorithm_soothed = None
 
         self._modified_callbacks = set()
 
@@ -86,6 +90,16 @@ class Engine:
 
             self._algorithm = extract_surface_algorithm(EngineAlgorithm(self))
         return self._algorithm
+
+    @property
+    def algorithm_soothed(self):
+        if self._algorithm_soothed is None:
+            from kale.algorithms import subdivide_algorithm
+
+            self._algorithm_soothed = subdivide_algorithm(
+                cell_data_to_point_data_algorithm(self.algorithm), 3
+            )
+        return self._algorithm_soothed
 
     @property
     def boundary(self):

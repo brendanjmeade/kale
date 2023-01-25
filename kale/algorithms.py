@@ -189,3 +189,11 @@ def contour_banded(
 
     # GetOutputPort(1) are the edges
     return rename, contour  # TODO.GetOutputPort(1)
+
+
+def subdivide_algorithm(inp, n):
+    """Subdivide and smooth the data fields on mesh."""
+    sfilter = _vtk.vtkLoopSubdivisionFilter()
+    sfilter.SetNumberOfSubdivisions(n)
+    set_algorithm_input(sfilter, inp)
+    return sfilter
