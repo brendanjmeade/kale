@@ -5,7 +5,7 @@ dependencies:
   - python>=3.7
   - jupyterlab
   - numpy
-  - vtk
+  - vtk>=9.2.5
   - matplotlib
   - imageio>=2.5.0
   - h5py
