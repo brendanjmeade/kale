@@ -34,6 +34,6 @@ def time_controls(engine: Engine, plotter: pv.BasePlotter):
 
 
 def show_ui(engine: Engine, plotter: pv.BasePlotter):
-    iframe = plotter.show()
+    iframe = plotter.show(return_viewer=True)
     controls = time_controls(engine, plotter)
     return widgets.VBox([iframe, controls])
