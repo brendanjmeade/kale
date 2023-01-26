@@ -1,5 +1,7 @@
+import collections.abc
 import traceback
 
+import numpy as np
 import pyvista
 from pyvista import _vtk
 from pyvista.errors import MissingDataError
@@ -77,7 +79,7 @@ class RenameArrayAlgorithm(PreserveTypeAlgorithmBase):
 
 def contour_banded(
     self,
-    n_contours,
+    contours,
     scalars,
     rng=None,
     component=0,
@@ -98,8 +100,8 @@ def contour_banded(
 
     Parameters
     ----------
-    n_contours : int
-        Number of contours.
+    n_contours : int or Sequence
+        Number of contours or a sequence of contour values to use.
 
     rng : Sequence, optional
         Range of the scalars. Optional and defaults to the minimum and
@@ -166,7 +168,16 @@ def contour_banded(
         rng = (self.active_scalars.min(), self.active_scalars.max())
 
     contour = _vtk.vtkBandedPolyDataContourFilter()
-    contour.GenerateValues(n_contours, rng[0], rng[1])
+    if isinstance(contours, int):
+        # generate values
+        contour.GenerateValues(contours, rng)
+    elif isinstance(contours, (np.ndarray, collections.abc.Sequence)):
+        contour.SetNumberOfContours(len(contours))
+        for i, val in enumerate(contours):
+            contour.SetValue(i, val)
+    else:
+        raise TypeError("isosurfaces not understood.")
+
     set_algorithm_input(contour, algo or self, port=0)
     contour.SetClipping(clipping)
     if scalar_mode == "value":
