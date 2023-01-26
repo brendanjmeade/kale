@@ -31,3 +31,9 @@ def time_controls(engine: Engine, plotter: pv.BasePlotter):
     slider = widgets.IntSlider(min=0, max=tmax, continuous_update=True)
     widgets.jslink((play, "value"), (slider, "value"))
     return widgets.HBox([play, slider])
+
+
+def show_ui(engine: Engine, plotter: pv.BasePlotter):
+    iframe = plotter.show()
+    controls = time_controls(engine, plotter)
+    return widgets.VBox([iframe, controls])

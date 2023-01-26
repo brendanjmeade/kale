@@ -21,7 +21,7 @@ class Engine:
         self._ds = xr.open_dataset(data_filename, engine="netcdf4")
 
         self._algorithm = None
-        self._algorithm_soothed = None
+        self._algorithm_smoothed = None
 
         self._modified_callbacks = set()
 
@@ -92,14 +92,14 @@ class Engine:
         return self._algorithm
 
     @property
-    def algorithm_soothed(self):
-        if self._algorithm_soothed is None:
+    def algorithm_smoothed(self):
+        if self._algorithm_smoothed is None:
             from kale.algorithms import subdivide_algorithm
 
-            self._algorithm_soothed = subdivide_algorithm(
+            self._algorithm_smoothed = subdivide_algorithm(
                 cell_data_to_point_data_algorithm(self.algorithm), 3
             )
-        return self._algorithm_soothed
+        return self._algorithm_smoothed
 
     @property
     def boundary(self):
@@ -109,6 +109,23 @@ class Engine:
         that the mesh geometry does not change).
         """
         return self.mesh.extract_feature_edges(
+            boundary_edges=True,
+            non_manifold_edges=False,
+            feature_edges=False,
+            manifold_edges=False,
+        )
+
+    @property
+    def boundary_smoothed(self):
+        """Outline the boundary of the mesh.
+
+        Please note that this is a static mesh (Engine assumes
+        that the mesh geometry does not change).
+        """
+        alg = self.algorithm_smoothed
+        alg.Update()
+        mesh = pv.wrap(alg.GetOutputDataObject(0))
+        return mesh.extract_feature_edges(
             boundary_edges=True,
             non_manifold_edges=False,
             feature_edges=False,
