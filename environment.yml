@@ -13,7 +13,7 @@ dependencies:
   - xarray
   - ipyvtklink
   - colorcet
-  - pyvista>=0.38.0
+  - pyvista>=0.38.1
   - pip
   - pip:
       - trame>=2.2.6
