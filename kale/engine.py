@@ -97,9 +97,17 @@ class Engine:
             from kale.algorithms import subdivide_algorithm
 
             self._algorithm_smoothed = subdivide_algorithm(
-                cell_data_to_point_data_algorithm(self.algorithm), 3
+                cell_data_to_point_data_algorithm(self.algorithm), 1
             )
         return self._algorithm_smoothed
+
+    @property
+    def smoothing_iterations(self):
+        return self.algorithm_smoothed.GetNumberOfSubdivisions()
+
+    @smoothing_iterations.setter
+    def smoothing_iterations(self, n: int):
+        return self.algorithm_smoothed.SetNumberOfSubdivisions(n)
 
     @property
     def boundary(self):
