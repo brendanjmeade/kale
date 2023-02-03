@@ -85,3 +85,9 @@ venv/
 
 *.vtk
 *.hdf
+
+*.mp4
+*.gif
+*.mpeg
+
+*.DS_Store
