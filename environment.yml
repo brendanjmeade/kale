@@ -8,6 +8,7 @@ dependencies:
   - vtk>=9.2.5
   - matplotlib
   - imageio>=2.5.0
+  - imageio-ffmpeg
   - h5py
   - netcdf4
   - xarray
