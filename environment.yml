@@ -12,6 +12,7 @@ dependencies:
   - h5py
   - netcdf4
   - xarray
+  - meshio
   - ipyvtklink
   - colorcet
   - pyvista>=0.38.1
