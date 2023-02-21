@@ -86,7 +86,7 @@ def contour_banded(
     clip_tolerance=1e-6,
     # generate_contour_edges=True,
     scalar_mode="index",
-    clipping=True,
+    clipping=False,
 ):
     """Generate filled contours.
 
@@ -132,7 +132,7 @@ def contour_banded(
         produced by the clipping range. If ``'value'``, then a scalar value
         which is a value between clip values is used.
 
-    clipping : bool, default: True
+    clipping : bool, default: False
         Indicate whether to clip outside ``rng`` and only return cells with
         values within ``rng``.
 
