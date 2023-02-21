@@ -208,3 +208,51 @@ def subdivide_algorithm(inp, n):
     sfilter.SetNumberOfSubdivisions(n)
     set_algorithm_input(sfilter, inp)
     return sfilter
+
+
+class ActiveScalarsOperationAlgorithm(PreserveTypeAlgorithmBase):
+    """vtkAlgorithm to perform a user operation on the active scalars.
+
+    The operation must be a callable that accepts the
+    input numpy array of the input's active scalars.
+
+    This assumes the type of the mesh is preserved
+    through the operation.
+
+    """
+
+    def __init__(self, operation: callable, output_scalars_name=None):
+        """Initialize algorithm."""
+        _vtk.VTKPythonAlgorithmBase.__init__(
+            self,
+            nInputPorts=1,
+            nOutputPorts=1,
+        )
+        self.operation = operation
+        self.output_scalars_name = output_scalars_name
+
+    def RequestData(self, request, inInfo, outInfo):
+        """Perform algorithm execution."""
+        try:
+            inp = pyvista.wrap(self.GetInputData(inInfo, 0, 0))
+            out = self.GetOutputData(outInfo, 0)
+            result = inp.copy(deep=True)
+            if self.output_scalars_name:
+                name = self.output_scalars_name
+            else:
+                name = f"fn({result.active_scalars_name})"
+            result[name] = self.operation(result[result.active_scalars_name])
+            result.set_active_scalars(name)
+            out.ShallowCopy(result)
+        except Exception as e:  # pragma: no cover
+            traceback.print_exc()
+            raise e
+        return 1
+
+
+def scalars_operation_algorithm(inp, operation, output_scalars_name=None):
+    operator = ActiveScalarsOperationAlgorithm(
+        operation=operation, output_scalars_name=output_scalars_name
+    )
+    set_algorithm_input(operator, inp)
+    return operator
