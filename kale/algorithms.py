@@ -100,16 +100,16 @@ def contour_banded(
 
     Parameters
     ----------
-    n_contours : int or Sequence
+    contours : int or Sequence
         Number of contours or a sequence of contour values to use.
+
+     scalars : str
+        The name of the scalar array to use for contouring.  If ``None``,
+        the active scalar array will be used.
 
     rng : Sequence, optional
         Range of the scalars. Optional and defaults to the minimum and
         maximum of the active scalars of ``scalars``.
-
-    scalars : str
-        The name of the scalar array to use for contouring.  If ``None``,
-        the active scalar array will be used.
 
     component : int, default: 0
         The component to use of an input scalars array with more than one
