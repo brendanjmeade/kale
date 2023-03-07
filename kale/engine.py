@@ -61,6 +61,8 @@ class Engine:
         """Returns variable array for current time step."""
         var = np.array(self.ds[name][self.time_step, :])
         if len(var) != self.mesh.n_cells:
+            print(f"{len(var)=}")
+            print(f"{self.mesh.n_cells=}")
             raise ValueError("Dimensional mismatch between data and mesh")
         return var
 
