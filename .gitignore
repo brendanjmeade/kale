@@ -92,3 +92,10 @@ venv/
 *.mpeg
 
 *.DS_Store
+
+# artifacts
+*.png
+*.pdf
+*.jpg
+*.npz
+*.npy
