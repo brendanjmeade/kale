@@ -13,6 +13,7 @@ dependencies:
   - netcdf4
   - xarray
   - meshio
+  - addict
   - ipyvtklink
   - colorcet
   - pyvista>=0.38.1
