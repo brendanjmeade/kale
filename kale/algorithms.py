@@ -85,7 +85,7 @@ def contour_banded(
     component=0,
     clip_tolerance=1e-6,
     # generate_contour_edges=True,
-    scalar_mode="index",
+    scalar_mode='value',
     clipping=False,
 ):
     """Generate filled contours.
