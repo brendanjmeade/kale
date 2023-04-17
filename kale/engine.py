@@ -118,12 +118,14 @@ class Engine:
         Please note that this is a static mesh (Engine assumes
         that the mesh geometry does not change).
         """
-        return self.mesh.extract_feature_edges(
+        edges =  self.mesh.extract_feature_edges(
             boundary_edges=True,
             non_manifold_edges=False,
             feature_edges=False,
             manifold_edges=False,
         )
+        edges.clear_data()
+        return edges
 
     @property
     def boundary_smoothed(self):
@@ -135,9 +137,11 @@ class Engine:
         alg = self.algorithm_smoothed
         alg.Update()
         mesh = pv.wrap(alg.GetOutputDataObject(0))
-        return mesh.extract_feature_edges(
+        edges = mesh.extract_feature_edges(
             boundary_edges=True,
             non_manifold_edges=False,
             feature_edges=False,
             manifold_edges=False,
         )
+        edges.clear_data()
+        return edges
