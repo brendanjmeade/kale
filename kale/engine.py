@@ -118,7 +118,7 @@ class Engine:
         Please note that this is a static mesh (Engine assumes
         that the mesh geometry does not change).
         """
-        edges =  self.mesh.extract_feature_edges(
+        edges = self.mesh.extract_feature_edges(
             boundary_edges=True,
             non_manifold_edges=False,
             feature_edges=False,

@@ -1,7 +1,7 @@
 """Requires https://github.com/pyvista/pyvista/pull/3870"""
 import pyvista as pv
-from pyvista.themes import DocumentTheme
 from pyvista._vtk import vtkMapper
+from pyvista.themes import DocumentTheme
 
 # VTK configurations to improve rendering
 vtkMapper.SetResolveCoincidentTopologyToPolygonOffset()
