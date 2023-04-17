@@ -30,6 +30,8 @@ SCALAR_BAR_OPTS = dict(
     font_family="arial",
     shadow=True,  # False
 )
+SCALAR_BAR_V = dict(vertical=True, **SCALAR_BAR_OPTS)
+SCALAR_BAR_H = dict(vertical=False, **SCALAR_BAR_OPTS)
 
 
 class KaleTheme(DocumentTheme):
@@ -59,16 +61,21 @@ class KaleTheme(DocumentTheme):
         # Default hide scalar bar - must explicitly enable it
         self.show_scalar_bar = False
 
+        # Default orientation
         self.colorbar_orientation = "vertical"
+
+        # Parameters for vertical
         self.colorbar_vertical.height = 0.20  # .50
         self.colorbar_vertical.width = 0.05  # .10
         self.colorbar_vertical.position_x = 0.05
         self.colorbar_vertical.position_y = 0.40
 
+        # Parameters for horizontal
         self.colorbar_horizontal.height = 0.03
         self.colorbar_horizontal.width = 0.50
         self.colorbar_horizontal.position_x = 0.25
         self.colorbar_horizontal.position_y = 0.275
 
+        # TODO: antialiassing
 
 pv.set_plot_theme(KaleTheme())
