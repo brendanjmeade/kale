@@ -2,7 +2,7 @@ name: kale
 channels:
   - conda-forge
 dependencies:
-  - python>=3.7
+  - python>=3.8
   - jupyterlab
   - numpy
   - vtk>=9.2.5
@@ -14,13 +14,11 @@ dependencies:
   - xarray
   - meshio
   - addict
-  - ipyvtklink
   - colorcet
-  - pyvista>=0.38.1
+  - pyvista>=0.38.5
   - tqdm
+  - trame>=2.2.6
+  - trame-client>=2.4.2
+  - trame-server>=2.8.0
+  - trame-vtk>=2.4.4
   - pip
-  - pip:
-      - trame>=2.2.6
-      - trame-client>=2.4.2
-      - trame-server>=2.8.0
-      - trame-vtk>=2.0.17
