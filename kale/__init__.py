@@ -5,9 +5,3 @@ from kale.algorithms import *
 from kale.engine import Engine
 from kale import theme
 from kale.widgets import time_controls, save_movie, show_ui
-
-
-# DO NOT COMMIT
-import os
-
-os.chdir("/data/projects/harvard/kale/")
