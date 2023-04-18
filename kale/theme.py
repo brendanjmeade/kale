@@ -78,4 +78,5 @@ class KaleTheme(DocumentTheme):
 
         # TODO: antialiassing
 
+
 pv.set_plot_theme(KaleTheme())
