@@ -1,5 +1,6 @@
 import collections.abc
 import traceback
+import weakref
 
 import numpy as np
 import pyvista
@@ -36,6 +37,33 @@ class EngineAlgorithm(_vtk.VTKPythonAlgorithmBase):
         try:
             out = self.GetOutputData(outInfo, 0)
             out.ShallowCopy(self.engine.mesh)
+        except Exception as e:  # pragma: no cover
+            traceback.print_exc()
+            raise e
+        return 1
+
+
+class OutputPortAlgorithm(PreserveTypeAlgorithmBase):
+    """vtkAlgorithm container for output ports.
+
+    Work around for https://gitlab.kitware.com/vtk/vtk/-/issues/18776
+    """
+
+    def __init__(self, source, port):
+        """Initialize algorithm."""
+        _vtk.VTKPythonAlgorithmBase.__init__(
+            self,
+            nInputPorts=1,
+            nOutputPorts=1,
+        )
+        self.SetInputConnection(0, source.GetOutputPort(port))
+        self.port = port
+
+    def RequestData(self, request, inInfo, outInfo):
+        """Perform algorithm execution."""
+        try:
+            out = self.GetOutputData(outInfo, 0)
+            out.ShallowCopy(self.GetInputData(inInfo, 0, 0))
         except Exception as e:  # pragma: no cover
             traceback.print_exc()
             raise e
@@ -85,7 +113,7 @@ def contour_banded(
     component=0,
     clip_tolerance=1e-6,
     # generate_contour_edges=True,
-    scalar_mode='value',
+    scalar_mode="value",
     clipping=False,
 ):
     """Generate filled contours.
@@ -199,7 +227,7 @@ def contour_banded(
     set_algorithm_input(rename, contour, port=0)
 
     # GetOutputPort(1) are the edges
-    return rename, contour  # TODO.GetOutputPort(1)
+    return rename, OutputPortAlgorithm(contour, 1)
 
 
 def subdivide_algorithm(inp, n):
