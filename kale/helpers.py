@@ -29,16 +29,16 @@ def add_contours(plotter, source, scalars, levels, **kwargs):
 def add_bounds(plotter, **kwargs):
     # Requires https://github.com/pyvista/pyvista/pull/3977
     args = dict(
-        grid='back',
-        location='outer',
-        ticks='both',
+        grid="back",
+        location="outer",
+        ticks="both",
         n_xlabels=2,
         n_ylabels=2,
         n_zlabels=2,
-        xtitle='Easting',
-        ytitle='Northing',
-        ztitle='Elevation',
-        fmt='%.2f',
+        xtitle="Easting",
+        ytitle="Northing",
+        ztitle="Elevation",
+        fmt="%.2f",
     )
     args.update(kwargs)
 
