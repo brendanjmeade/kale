@@ -121,13 +121,15 @@ class Engine:
         Please note that this is a static mesh (Engine assumes
         that the mesh geometry does not change).
         """
-        edges = self.mesh.extract_feature_edges(
+        from kale.algorithms import extract_feature_edges_algorithm
+
+        edges = extract_feature_edges_algorithm(
+            self.algorithm,
             boundary_edges=True,
             non_manifold_edges=False,
             feature_edges=False,
             manifold_edges=False,
         )
-        edges.clear_data()
         return edges
 
     @property
@@ -137,14 +139,13 @@ class Engine:
         Please note that this is a static mesh (Engine assumes
         that the mesh geometry does not change).
         """
-        alg = self.algorithm_smoothed
-        alg.Update()
-        mesh = pv.wrap(alg.GetOutputDataObject(0))
-        edges = mesh.extract_feature_edges(
+        from kale.algorithms import extract_feature_edges_algorithm
+
+        edges = extract_feature_edges_algorithm(
+            self.algorithm_smoothed,
             boundary_edges=True,
             non_manifold_edges=False,
             feature_edges=False,
             manifold_edges=False,
         )
-        edges.clear_data()
         return edges

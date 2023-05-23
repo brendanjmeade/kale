@@ -5,7 +5,7 @@ from tqdm import tqdm
 from kale.engine import Engine
 
 
-def time_controls(engine: Engine, plotter: pv.BasePlotter):
+def time_controls(engine: Engine, plotter: pv.BasePlotter, continuous_update=True):
     def update_time_step(time_step):
         engine.time_step = time_step
         plotter.render()
@@ -29,16 +29,16 @@ def time_controls(engine: Engine, plotter: pv.BasePlotter):
     )
     play.observe(set_time, "value")
 
-    slider = widgets.IntSlider(min=0, max=tmax, continuous_update=True)
+    slider = widgets.IntSlider(min=0, max=tmax, continuous_update=continuous_update)
     widgets.jslink((play, "value"), (slider, "value"))
     return widgets.HBox([play, slider])
 
 
-def show_ui(engine: Engine, plotter: pv.BasePlotter):
+def show_ui(engine: Engine, plotter: pv.BasePlotter, continuous_update=True):
     iframe = plotter.show(
         return_viewer=True, jupyter_kwargs={"height": "600px", "width": "99%"}
     )
-    controls = time_controls(engine, plotter)
+    controls = time_controls(engine, plotter, continuous_update=continuous_update)
     return widgets.VBox([iframe, controls])
 
 

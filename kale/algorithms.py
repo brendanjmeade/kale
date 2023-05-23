@@ -6,10 +6,7 @@ import numpy as np
 import pyvista
 from pyvista import FieldAssociation, _vtk
 from pyvista.errors import MissingDataError
-from pyvista.utilities import (
-    get_array,
-    get_array_association,
-)
+from pyvista.utilities import get_array, get_array_association
 from pyvista.utilities.algorithms import (
     PreserveTypeAlgorithmBase,
     active_scalars_algorithm,
@@ -290,9 +287,12 @@ def scalars_operation_algorithm(inp, operation, output_scalars_name=None):
     return operator
 
 
-def warp_by_scalar(
-        self, scalars=None, factor=1.0, normal=None,
-    ):
+def warp_by_scalar_algorithm(
+    self,
+    scalars=None,
+    factor=1.0,
+    normal=None,
+):
     """Warp the dataset's points by a point data scalars array's values.
 
     This modifies point coordinates by moving points along point
@@ -338,11 +338,11 @@ def warp_by_scalar(
     if scalars is None:
         pyvista.set_default_active_scalars(self)
         field, scalars = self.active_scalars_info
-    _ = get_array(self, scalars, preference='point', err=True)
+    _ = get_array(self, scalars, preference="point", err=True)
 
-    field = get_array_association(self, scalars, preference='point')
+    field = get_array_association(self, scalars, preference="point")
     if field != FieldAssociation.POINT:
-        raise TypeError('Dataset can only by warped by a point data array.')
+        raise TypeError("Dataset can only by warped by a point data array.")
     # Run the algorithm
     alg = _vtk.vtkWarpScalar()
     set_algorithm_input(alg, algo or self, port=0)
@@ -354,3 +354,81 @@ def warp_by_scalar(
         alg.SetNormal(normal)
         alg.SetUseNormal(True)
     return alg
+
+
+def extract_feature_edges_algorithm(
+    dataset,
+    feature_angle=30.0,
+    boundary_edges=True,
+    non_manifold_edges=True,
+    feature_edges=True,
+    manifold_edges=True,
+    clear_data=True,
+):
+    """Extract edges from the surface of the mesh.
+
+    If the given mesh is not PolyData, the external surface of the given
+    mesh is extracted and used.
+
+    From vtk documentation, the edges are one of the following:
+
+        1) Boundary (used by one polygon) or a line cell.
+        2) Non-manifold (used by three or more polygons).
+        3) Feature edges (edges used by two triangles and whose
+            dihedral angle > feature_angle).
+        4) Manifold edges (edges used by exactly two polygons).
+
+    Parameters
+    ----------
+    feature_angle : float, default: 30.0
+        Feature angle (in degrees) used to detect sharp edges on
+        the mesh. Used only when ``feature_edges=True``.
+
+    boundary_edges : bool, default: True
+        Extract the boundary edges.
+
+    non_manifold_edges : bool, default: True
+        Extract non-manifold edges.
+
+    feature_edges : bool, default: True
+        Extract edges exceeding ``feature_angle``.
+
+    manifold_edges : bool, default: True
+        Extract manifold edges.
+
+    clear_data : bool, default: True
+        Clear any point, cell, or field data. This is useful
+        if wanting to strictly extract the edges.
+
+    Returns
+    -------
+    vtkAlgorithm
+        The extraction algorithm.
+
+    Examples
+    --------
+    Extract the edges from an unstructured grid.
+
+    >>> import pyvista
+    >>> from pyvista import examples
+    >>> hex_beam = pyvista.read(examples.hexbeamfile)
+    >>> feat_edges = hex_beam.extract_feature_edges()
+    >>> feat_edges.clear_data()  # clear array data for plotting
+    >>> feat_edges.plot(line_width=10)
+
+    See the :ref:`extract_edges_example` for more examples using this filter.
+
+    """
+    mesh, algo = algorithm_to_mesh_handler(dataset)
+    if not isinstance(mesh, _vtk.vtkPolyData):
+        algo = extract_surface_algorithm(algo or mesh)
+    featureEdges = _vtk.vtkFeatureEdges()
+    set_algorithm_input(featureEdges, algo or mesh)
+    featureEdges.SetFeatureAngle(feature_angle)
+    featureEdges.SetManifoldEdges(manifold_edges)
+    featureEdges.SetNonManifoldEdges(non_manifold_edges)
+    featureEdges.SetBoundaryEdges(boundary_edges)
+    featureEdges.SetFeatureEdges(feature_edges)
+    featureEdges.SetColoring(False)
+    # TODO: clear_data
+    return featureEdges
