@@ -65,7 +65,7 @@ class KaleTheme(DocumentTheme):
         self.colorbar_orientation = "vertical"
 
         # Parameters for vertical
-        self.colorbar_vertical.height = 0.20  # .50
+        self.colorbar_vertical.height = 0.50  # .20
         self.colorbar_vertical.width = 0.05  # .10
         self.colorbar_vertical.position_x = 0.05
         self.colorbar_vertical.position_y = 0.40

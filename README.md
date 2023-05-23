@@ -7,3 +7,5 @@ This requires the follow upstream work in PyVista:
 - [merged] https://github.com/pyvista/pyvista/pull/3318
 - [merged] https://github.com/pyvista/pyvista/pull/3385
 - [merged] https://github.com/pyvista/pyvista/pull/3977
+- [merged] https://github.com/pyvista/pyvista/pull/4294
+- [merged] https://github.com/pyvista/pyvista/pull/4295
