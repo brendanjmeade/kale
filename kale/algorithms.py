@@ -4,8 +4,12 @@ import weakref
 
 import numpy as np
 import pyvista
-from pyvista import _vtk
+from pyvista import FieldAssociation, _vtk
 from pyvista.errors import MissingDataError
+from pyvista.utilities import (
+    get_array,
+    get_array_association,
+)
 from pyvista.utilities.algorithms import (
     PreserveTypeAlgorithmBase,
     active_scalars_algorithm,
@@ -284,3 +288,69 @@ def scalars_operation_algorithm(inp, operation, output_scalars_name=None):
     )
     set_algorithm_input(operator, inp)
     return operator
+
+
+def warp_by_scalar(
+        self, scalars=None, factor=1.0, normal=None,
+    ):
+    """Warp the dataset's points by a point data scalars array's values.
+
+    This modifies point coordinates by moving points along point
+    normals by the scalar amount times the scale factor.
+
+    Parameters
+    ----------
+    scalars : str, optional
+        Name of scalars to warp by. Defaults to currently active scalars.
+
+    factor : float, default: 1.0
+        A scaling factor to increase the scaling effect. Alias
+        ``scale_factor`` also accepted - if present, overrides ``factor``.
+
+    normal : sequence, optional
+        User specified normal. If given, data normals will be
+        ignored and the given normal will be used to project the
+        warp.
+
+    Returns
+    -------
+    pyvista.DataSet
+        Warped Dataset.  Return type matches input.
+
+    Examples
+    --------
+    First, plot the unwarped mesh.
+
+    >>> from pyvista import examples
+    >>> mesh = examples.download_st_helens()
+    >>> mesh.plot(cmap='gist_earth', show_scalar_bar=False)
+
+    Now, warp the mesh by the ``'Elevation'`` scalars.
+
+    >>> warped = mesh.warp_by_scalar('Elevation')
+    >>> warped.plot(cmap='gist_earth', show_scalar_bar=False)
+
+    See :ref:`surface_normal_example` for more examples using this filter.
+
+    """
+    self, algo = algorithm_to_mesh_handler(self)
+
+    if scalars is None:
+        pyvista.set_default_active_scalars(self)
+        field, scalars = self.active_scalars_info
+    _ = get_array(self, scalars, preference='point', err=True)
+
+    field = get_array_association(self, scalars, preference='point')
+    if field != FieldAssociation.POINT:
+        raise TypeError('Dataset can only by warped by a point data array.')
+    # Run the algorithm
+    alg = _vtk.vtkWarpScalar()
+    set_algorithm_input(alg, algo or self, port=0)
+    alg.SetInputArrayToProcess(
+        0, 0, 0, field.value, scalars
+    )  # args: (idx, port, connection, field, name)
+    alg.SetScaleFactor(factor)
+    if normal is not None:
+        alg.SetNormal(normal)
+        alg.SetUseNormal(True)
+    return alg
