@@ -67,7 +67,10 @@ class Engine:
         return var
 
     def clim(self, name=None):
-        var = np.array(self.ds[name or self.mesh.active_scalars_name or self.keys[0]])
+        # NOTE: using last timestep to avoid loading entire dataset
+        var = np.array(
+            self.ds[name or self.mesh.active_scalars_name or self.keys[0]][-2, :]
+        )
         return np.nanmin(var), np.nanmax(var)
 
     @property
