@@ -1,6 +1,6 @@
 """Requires https://github.com/pyvista/pyvista/pull/3870"""
 import pyvista as pv
-from pyvista._vtk import vtkMapper
+from vtkmodules.vtkRenderingCore import vtkMapper
 from pyvista.themes import DocumentTheme
 
 # VTK configurations to improve rendering
