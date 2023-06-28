@@ -1,7 +1,7 @@
 """Requires https://github.com/pyvista/pyvista/pull/3870"""
 import pyvista as pv
-from vtkmodules.vtkRenderingCore import vtkMapper
 from pyvista.themes import DocumentTheme
+from vtkmodules.vtkRenderingCore import vtkMapper
 
 # VTK configurations to improve rendering
 vtkMapper.SetResolveCoincidentTopologyToPolygonOffset()
@@ -32,6 +32,7 @@ SCALAR_BAR_OPTS = dict(
 )
 SCALAR_BAR_V = dict(vertical=True, **SCALAR_BAR_OPTS)
 SCALAR_BAR_H = dict(vertical=False, **SCALAR_BAR_OPTS)
+COASTLINE_COLOR = "grey"
 
 
 class KaleTheme(DocumentTheme):
